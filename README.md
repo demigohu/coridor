@@ -2,6 +2,8 @@
 
 On/off-ramp between **IDR** (via Xendit sandbox) and **USDC Blend** on Stellar testnet, built on [Anchor Platform](https://developers.stellar.org/docs/platforms/anchor-platform).
 
+**Documentation** (user guide, developers, FAQ): see **[docs/](./docs/README.md)**.
+
 ## Stack
 
 | Service | Port | Role |
