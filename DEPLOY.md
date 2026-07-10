@@ -128,10 +128,10 @@ HOST_SEP10_ACCOUNT=G...                # public key dari seed di atas
 # Production: ganti ke live key saat go-live
 XENDIT_SECRET_KEY=xnd_development_...
 XENDIT_WEBHOOK_TOKEN=...               # dari dashboard Xendit
-
-# Password DB production (ganti!)
-SECRET_DATA_PASSWORD=GantiDenganPasswordKuat123!
 ```
+
+> **DB password** hanya di `dev.env` (`SECRET_DATA_PASSWORD`), **bukan** di `.env.secrets`.
+> Postgres container pakai password yang sama — lihat §4.
 
 Generate JWT secret acak (min 32 karakter):
 
@@ -164,7 +164,7 @@ SEP10_HOME_DOMAINS=sep.coridor.fun
 SEP24_INTERACTIVE_URL_BASE_URL=https://api.coridor.fun/sep24/interactive
 SEP24_MORE_INFO_URL_BASE_URL=https://api.coridor.fun/sep24/transaction/more_info
 
-# DB password — harus sama dengan .env.secrets
+# DB password — ganti dari default; HARUS sama dengan password postgres saat volume pertama kali dibuat
 SECRET_DATA_PASSWORD=GantiDenganPasswordKuat123!
 
 # Stellar testnet (ubah ke pubnet saat production mainnet)
@@ -173,6 +173,17 @@ STELLAR_NETWORK_HORIZON_URL=https://horizon-testnet.stellar.org
 ```
 
 **Penting:** `STELLAR_NETWORK_TYPE=horizon` wajib untuk withdraw — RPC observer tidak mendeteksi classic USDC payment.
+
+**Password DB:** Postgres volume menyimpan password saat **first boot**. Kalau kamu ubah `SECRET_DATA_PASSWORD` setelah volume sudah ada, platform crash (`password authentication failed`).
+
+- **Fix cepat (data hackathon boleh hilang):** set `SECRET_DATA_PASSWORD=password` di `dev.env`, lalu:
+
+```bash
+docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml down -v
+docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
+```
+
+- **Fix dengan password kuat:** set `SECRET_DATA_PASSWORD` **sebelum** first `up`, atau `down -v` lalu `up` ulang dengan password baru.
 
 ---
 
@@ -321,8 +332,8 @@ cd /opt/coridor/coridor
 # Install deps coridor-server di host (sama seperti ap_start.sh)
 (cd coridor-server && npm install --omit=dev)
 
-# Build & start
-docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
+# Build & start (--env-file agar POSTGRES_PASSWORD = SECRET_DATA_PASSWORD)
+docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
 
 # Cek logs
 docker compose logs -f platform coridor-server
@@ -428,8 +439,8 @@ After=docker.service network-online.target
 Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/coridor/coridor
-ExecStart=/usr/bin/docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
-ExecStop=/usr/bin/docker compose -f docker-compose.yaml -f docker-compose.prod.yaml down
+ExecStart=/usr/bin/docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+ExecStop=/usr/bin/docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml down
 TimeoutStartSec=300
 
 [Install]
@@ -450,7 +461,7 @@ sudo systemctl enable coridor
 cd /opt/coridor/coridor
 git pull
 (cd coridor-server && npm install --omit=dev)
-docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
+docker compose --env-file dev.env -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
 docker compose logs -f --tail=50 platform coridor-server
 ```
 
@@ -464,6 +475,7 @@ docker compose logs -f --tail=50 platform coridor-server
 | Gejala                            | Penyebab               | Solusi                                                            |
 | --------------------------------- | ---------------------- | ----------------------------------------------------------------- |
 | `8091 address already in use`, `ss`/`lsof` kosong | Port dobel dari merge compose | Pakai `ports: !override` di `docker-compose.prod.yaml` (lihat §6) |
+| 502 sep / platform restart loop | Password DB beda | `SECRET_DATA_PASSWORD` di `dev.env` harus sama dengan password postgres volume; lihat §4 |
 | Demo Wallet tidak connect         | HTTP / domain salah    | Pastikan HTTPS + `SEP10_HOME_DOMAINS` match domain TOML           |
 | Deposit stuck setelah bayar       | Webhook tidak sampai   | Cek URL webhook Xendit + log `docker compose logs coridor-server` |
 | Withdraw USDC terkirim, IDR tidak | Observer tidak deteksi | Pastikan `STELLAR_NETWORK_TYPE=horizon`, bukan `rpc`              |

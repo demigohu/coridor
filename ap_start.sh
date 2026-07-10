@@ -65,8 +65,8 @@ if [ -f coridor-server/package.json ]; then
   }
 fi
 
-$DOCKER_COMPOSE down --remove-orphans 2>/dev/null || true
-$DOCKER_COMPOSE up -d --build
+$DOCKER_COMPOSE --env-file dev.env down --remove-orphans 2>/dev/null || true
+$DOCKER_COMPOSE --env-file dev.env up -d --build
 
 echo ""
 echo -e "${GREEN}========================================${NC}"
