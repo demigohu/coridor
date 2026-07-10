@@ -1,0 +1,6 @@
+items:
+  - name: demoWallet
+    type: noncustodial
+    domains:
+      - demo-wallet.stellar.org
+      - localhost

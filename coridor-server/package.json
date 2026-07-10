@@ -1,0 +1,17 @@
+{
+  "name": "coridor-server",
+  "version": "0.1.0",
+  "description": "Coridor business server — IDR on/off-ramp via Xendit + Anchor Platform",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^13.3.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^11.0.5"
+  }
+}

@@ -1,0 +1,27 @@
+ACCOUNTS = ["GCACTDNRY4V7QD4M6FSPGLCR5BNANSLBHIKACRTPSZ4B75NKL66QGSVS"]
+VERSION = "0.1.0"
+SIGNING_KEY = "${HOST_SEP10_ACCOUNT}"
+NETWORK_PASSPHRASE = "Test SDF Network ; September 2015"
+
+WEB_AUTH_ENDPOINT = "http://localhost:8082/auth"
+WEB_AUTH_FOR_CONTRACTS_ENDPOINT = "http://localhost:8082/sep45/auth"
+WEB_AUTH_CONTRACT_ID = "CD3LA6RKF5D2FN2R2L57MWXLBRSEWWENE74YBEFZSSGNJRJGICFGQXMX"
+KYC_SERVER = "http://localhost:8082/sep12"
+TRANSFER_SERVER = "http://localhost:8082/sep6"
+TRANSFER_SERVER_SEP0024 = "http://localhost:8082/sep24"
+ANCHOR_QUOTE_SERVER = "http://localhost:8082/sep38"
+
+[[CURRENCIES]]
+code = "USDC"
+issuer = "GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56"
+status = "test"
+is_asset_anchored = true
+anchor_asset_type = "fiat"
+desc = "USDC Blend on Stellar testnet — on/off-ramp via Coridor (IDR)"
+display_decimals = 2
+
+[DOCUMENTATION]
+ORG_NAME = "Coridor"
+ORG_URL = "https://github.com/coridor"
+ORG_DESCRIPTION = "Local IDR anchor for Indonesia — cash in/out between Rupiah and Stellar assets via Xendit."
+ORG_TWITTER = "coridor_id"

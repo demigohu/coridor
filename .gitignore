@@ -1,0 +1,11 @@
+# Secrets & generated config
+.env.secrets
+config/stellar.localhost.toml
+
+# Dependencies (install via npm on host / VPS — see ap_start.sh)
+coridor-server/node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

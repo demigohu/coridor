@@ -1,0 +1,61 @@
+items:
+  - id: stellar:USDC:GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56
+    distribution_account: GCACTDNRY4V7QD4M6FSPGLCR5BNANSLBHIKACRTPSZ4B75NKL66QGSVS
+    significant_decimals: 7
+    sep6:
+      enabled: true
+      deposit:
+        enabled: true
+        min_amount: 10000
+        max_amount: 10000000
+        methods:
+          - bank_transfer
+          - qris
+          - e_wallet
+      withdraw:
+        enabled: true
+        min_amount: 10000
+        max_amount: 10000000
+        methods:
+          - bank_transfer
+    sep24:
+      enabled: true
+      deposit:
+        enabled: true
+        min_amount: 10000
+        max_amount: 10000000
+        methods:
+          - bank_transfer
+          - qris
+          - e_wallet
+      withdraw:
+        enabled: true
+        min_amount: 10000
+        max_amount: 10000000
+        methods:
+          - bank_transfer
+    sep38:
+      enabled: true
+      exchangeable_assets:
+        - iso4217:IDR
+
+  - id: iso4217:IDR
+    significant_decimals: 0
+    sep31:
+      enabled: false
+    sep38:
+      enabled: true
+      exchangeable_assets:
+        - stellar:USDC:GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56
+      country_codes:
+        - ID
+      buy_delivery_methods:
+        - name: bank_transfer
+          description: Transfer bank / Virtual Account (BCA, Mandiri, BNI, dll.)
+        - name: qris
+          description: Bayar via scan QRIS
+        - name: e_wallet
+          description: OVO, DANA, ShopeePay, LinkAja
+      sell_delivery_methods:
+        - name: bank_transfer
+          description: Transfer IDR ke rekening bank Anda
