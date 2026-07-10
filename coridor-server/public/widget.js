@@ -39,6 +39,48 @@ function copyText(text, btn) {
   });
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function isEwalletChannel(channelCode) {
+  const code = String(channelCode || "").toUpperCase();
+  return ["OVO", "DANA", "SHOPEEPAY", "LINKAJA", "ASTRAPAY", "JENIUSPAY"].includes(code);
+}
+
+function getPaymentRequestId(xendit) {
+  return xendit?.payment_request_id || xendit?.id || null;
+}
+
+/** Parse Xendit v3 actions — PRESENT_TO_CUSTOMER / REDIRECT_CUSTOMER */
+function getActionContext(xendit, paymentUi) {
+  const actions = xendit?.actions || [];
+  const redirect = actions.find((a) => a.type === "REDIRECT_CUSTOMER");
+  const present =
+    actions.find((a) => a.type === "PRESENT_TO_CUSTOMER") || actions[0] || null;
+
+  return {
+    redirectUrl:
+      paymentUi?.redirect_url ||
+      redirect?.value ||
+      redirect?.url ||
+      null,
+    present,
+    qrString:
+      paymentUi?.qr_string ||
+      (present?.descriptor === "QR_STRING" ? present.value : null) ||
+      present?.qr_string ||
+      null,
+    vaNumber:
+      paymentUi?.va_number ||
+      (present?.descriptor === "VIRTUAL_ACCOUNT_NUMBER" ? present.value : null),
+  };
+}
+
 function renderWithdrawal(data) {
   const payment = document.getElementById("payment");
   const form = document.getElementById("form");
@@ -106,19 +148,57 @@ function renderWithdrawal(data) {
   });
 }
 
-function isEwalletChannel(channelCode) {
-  const code = String(channelCode || "").toUpperCase();
-  return ["OVO", "DANA", "SHOPEEPAY", "LINKAJA", "ASTRAPAY", "JENIUSPAY"].includes(code);
-}
+function renderQrisPanel({ amount, qrDataUrl, qrString, redirectUrl, sandboxMode }) {
+  const qrImg = qrDataUrl
+    ? `<img class="qris-qr" src="${qrDataUrl}" alt="QRIS ${escapeHtml(amount)}"/>`
+    : `<p class="hint fee-warn">QR belum tersedia — cek log server atau gunakan simulate.</p>`;
 
-function getPaymentRequestId(xendit) {
-  return xendit?.payment_request_id || xendit?.id || null;
+  const redirectLink = redirectUrl
+    ? `<a class="qris-hosted-link" href="${escapeHtml(redirectUrl)}" target="_blank" rel="noopener noreferrer">Buka halaman QRIS Xendit</a>`
+    : "";
+
+  const rawQr = qrString
+    ? `<details class="qr-raw">
+        <summary>Salin string QRIS (advanced)</summary>
+        <code class="qr-string-code"></code>
+        <button type="button" class="btn-copy btn-copy-inline btn-copy-qr">Salin</button>
+      </details>`
+    : "";
+
+  return `
+    <div class="qris-panel">
+      <div class="qris-header">
+        <div class="qris-brand">
+          <span class="qris-badge">QRIS</span>
+          <span class="qris-sub">Quick Response Indonesian Standard</span>
+        </div>
+        <strong class="qris-amount">${escapeHtml(amount)}</strong>
+      </div>
+      <div class="qris-frame">${qrImg}</div>
+      <ol class="steps qris-steps">
+        <li>Buka <strong>GoPay / OVO / Dana / m-banking</strong></li>
+        <li>Pilih menu <strong>Scan QR</strong></li>
+        <li>Arahkan kamera ke kode di atas</li>
+        <li>Pastikan nominal <strong>${escapeHtml(amount)}</strong> benar, lalu konfirmasi</li>
+      </ol>
+      ${redirectLink}
+      ${rawQr}
+      ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: QR sandbox tidak bisa di-scan app sungguhan. Gunakan tombol <strong>Simulate</strong> di bawah.</p>` : ""}
+    </div>
+  `;
 }
 
 function renderPayment(data) {
   const payment = document.getElementById("payment");
   const form = document.getElementById("form");
-  const { quote, xendit, transaction_id: transactionId, sandbox_mode: sandboxMode } = data;
+  const {
+    quote,
+    xendit,
+    transaction_id: transactionId,
+    sandbox_mode: sandboxMode,
+    qr_data_url: qrDataUrl,
+    payment_ui: paymentUi,
+  } = data;
 
   if (!xendit) {
     payment.hidden = false;
@@ -128,18 +208,22 @@ function renderPayment(data) {
 
   const paymentRequestId = getPaymentRequestId(xendit);
   const ewalletFlow = isEwalletChannel(xendit.channel_code);
-  const actions = xendit.actions || [];
-  const action =
-    actions.find((a) => a.type === "PRESENT_TO_CUSTOMER") || actions[0];
+  const { redirectUrl, present, qrString, vaNumber } = getActionContext(
+    xendit,
+    paymentUi
+  );
+  const isQris =
+    String(xendit.channel_code || "").toUpperCase() === "QRIS" || Boolean(qrString);
 
-  if (!actions.length && !ewalletFlow) {
+  if (!xendit.actions?.length && !ewalletFlow) {
     payment.hidden = false;
     payment.innerHTML = `<p class="hint">Quote dibuat. Cek instruksi di wallet.</p>`;
     return;
   }
 
-  if (action?.url) {
-    window.location.href = action.url;
+  // E-wallet redirect (DANA/ShopeePay) — leave widget for hosted auth page
+  if (redirectUrl && !isQris && !vaNumber) {
+    window.location.href = redirectUrl;
     return;
   }
 
@@ -150,9 +234,7 @@ function renderPayment(data) {
   const usdc = quote?.buy_amount || "?";
   const feeIdr = quote?.fee?.total;
   const netIdr =
-    feeIdr != null
-      ? Number(xendit.request_amount) - Number(feeIdr)
-      : null;
+    feeIdr != null ? Number(xendit.request_amount) - Number(feeIdr) : null;
   const expires = xendit.channel_properties?.expires_at
     ? new Date(xendit.channel_properties.expires_at).toLocaleString("id-ID")
     : null;
@@ -170,10 +252,19 @@ function renderPayment(data) {
       <p class="hint">Anda akan menerima <strong>${usdc} USDC</strong></p>
       ${netIdr != null && netIdr < 20000 ? `<p class="hint fee-warn">⚠️ Deposit kecil — fee Rp 5.000 memakan sebagian besar. Coba Rp 100.000+ untuk hasil lebih wajar.</p>` : ""}
       ${expires ? `<p class="hint">Berlaku sampai ${expires}</p>` : ""}
+      ${paymentUi?.action_types?.length ? `<p class="hint"><small>Xendit: ${paymentUi.action_types.map((a) => `${a.type}${a.descriptor ? `/${a.descriptor}` : ""}`).join(", ")}</small></p>` : ""}
     </div>
   `;
 
-  if (ewalletFlow && !actions.length) {
+  if (isQris && qrString) {
+    body += renderQrisPanel({
+      amount,
+      qrDataUrl,
+      qrString,
+      redirectUrl,
+      sandboxMode,
+    });
+  } else if (ewalletFlow && !xendit.actions?.length) {
     body += `
       <div class="pay-box">
         <span class="pay-label">Bayar via ${walletLabel}</span>
@@ -187,7 +278,8 @@ function renderPayment(data) {
         ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: push ${walletLabel} tidak jalan di sandbox. Tombol simulate di bawah akan langsung menyelesaikan deposit + kirim USDC (OVO tidak punya simulate API di Xendit).</p>` : ""}
       </div>
     `;
-  } else if (action?.descriptor === "VIRTUAL_ACCOUNT_NUMBER") {
+  } else if (vaNumber || present?.descriptor === "VIRTUAL_ACCOUNT_NUMBER") {
+    const va = vaNumber || present.value;
     const bank =
       xendit.channel_code?.replace("_VIRTUAL_ACCOUNT", "").replace("_", " ") ||
       "Virtual Account";
@@ -195,33 +287,27 @@ function renderPayment(data) {
       <div class="pay-box">
         <span class="pay-label">Virtual Account ${bank}</span>
         <div class="pay-value-row">
-          <code id="payValue">${action.value}</code>
-          <button type="button" class="btn-copy" data-copy="${action.value}">Salin</button>
+          <code id="payValue">${escapeHtml(va)}</code>
+          <button type="button" class="btn-copy" data-copy="${escapeHtml(va)}">Salin</button>
         </div>
         <p class="hint">Transfer tepat <strong>${amount}</strong> ke nomor VA di atas via m-banking / ATM.</p>
         <p class="hint fee-warn">Bukan input rekening Anda — ini nomor tujuan transfer dari Xendit.</p>
         ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: VA tidak bisa dibayar via m-banking sungguhan. Gunakan tombol simulate di bawah.</p>` : ""}
       </div>
     `;
-  } else if (action.descriptor === "QR_STRING") {
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(action.value)}`;
+  } else if (redirectUrl) {
     body += `
       <div class="pay-box">
-        <span class="pay-label">Scan QRIS</span>
-        <img class="qr-img" src="${qrUrl}" alt="QRIS"/>
-        <details class="qr-raw">
-          <summary>Atau salin kode QR</summary>
-          <code>${action.value}</code>
-        </details>
-        <p class="hint">Buka GoPay / OVO / m-banking, pilih Scan QR, lalu bayar ${amount}.</p>
-        ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: QR ini tidak bisa di-scan app sungguhan. Gunakan tombol simulate di bawah.</p>` : ""}
+        <span class="pay-label">Lanjutkan pembayaran</span>
+        <p class="hint">Xendit memerlukan autentikasi di halaman ${walletLabel || "e-wallet"}.</p>
+        <a class="qris-hosted-link" href="${escapeHtml(redirectUrl)}" target="_blank" rel="noopener noreferrer">Buka halaman pembayaran</a>
       </div>
     `;
   } else {
     body += `
       <div class="pay-box">
-        <p class="hint">Selesaikan pembayaran di aplikasi OVO. Cek notifikasi push di HP.</p>
-        ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: push OVO tidak jalan di sandbox. Gunakan tombol simulate di bawah.</p>` : ""}
+        <p class="hint">Selesaikan pembayaran di aplikasi ${walletLabel}. Cek notifikasi push di HP.</p>
+        ${sandboxMode ? `<p class="hint fee-warn">⚠️ Test mode: push tidak jalan di sandbox. Gunakan tombol simulate di bawah.</p>` : ""}
       </div>
     `;
   }
@@ -231,7 +317,7 @@ function renderPayment(data) {
       <button type="button" id="confirmSandboxBtn" class="btn-sandbox">
         Simulate pembayaran (Xendit Test Mode)
       </button>
-      <p class="hint sandbox-hint">Hanya deposit sandbox: tombol ini memicu Xendit simulate + kirim USDC ke wallet Anda.</p>
+      <p class="hint sandbox-hint">Memicu <code>POST /v3/payment_requests/:id/simulate</code> lalu kirim USDC.</p>
     `;
   }
 
@@ -241,6 +327,13 @@ function renderPayment(data) {
   `;
 
   payment.innerHTML = body;
+
+  const qrCodeEl = payment.querySelector(".qr-string-code");
+  const qrCopyBtn = payment.querySelector(".btn-copy-qr");
+  if (qrCodeEl && qrString) qrCodeEl.textContent = qrString;
+  if (qrCopyBtn && qrString) {
+    qrCopyBtn.addEventListener("click", () => copyText(qrString, qrCopyBtn));
+  }
 
   payment.querySelectorAll(".btn-copy").forEach((btn) => {
     btn.addEventListener("click", () => copyText(btn.dataset.copy, btn));
@@ -268,6 +361,7 @@ function renderPayment(data) {
             <p><strong>Pembayaran berhasil!</strong></p>
             <p class="hint">${usdc} USDC terkirim ke wallet Anda.</p>
             ${out.note ? `<p class="hint fee-warn">${out.note}</p>` : ""}
+            ${out.simulated === false ? `<p class="hint"><small>Simulate API tidak support channel ini — force-complete sandbox.</small></p>` : ""}
             <p class="hint"><small>Stellar tx: ${out.stellar_transaction_id || "—"}</small></p>
             <p class="hint">Tutup popup dan refresh transaksi di Demo Wallet.</p>
           </div>

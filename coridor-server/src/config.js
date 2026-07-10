@@ -41,6 +41,13 @@ export const config = {
   networkPassphrase:
     process.env.STELLAR_NETWORK_PASSPHRASE ||
     "Test SDF Network ; September 2015",
+
+  /** Public base URL for Xendit return URLs (no trailing slash) */
+  publicBaseUrl: (
+    process.env.CORIDOR_PUBLIC_BASE_URL ||
+    process.env.SEP24_INTERACTIVE_URL_BASE_URL?.replace(/\/sep24\/interactive\/?$/, "") ||
+    "http://localhost:8091"
+  ).replace(/\/$/, ""),
 };
 
 export const USDC_ISSUER =

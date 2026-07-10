@@ -122,23 +122,101 @@ button:disabled { opacity: .6; cursor: wait; }
 .btn-sandbox:hover { background: #0369a1; }
 .btn-sandbox:disabled { opacity: .6; cursor: wait; }
 .sandbox-hint { font-size: .75rem; color: #64748b; }
-.qr-img {
-  display: block;
-  margin: .75rem auto;
-  border-radius: 8px;
-  background: white;
-  padding: .5rem;
-}
 .qr-raw {
   text-align: left;
   font-size: .75rem;
   color: #94a3b8;
+  margin-top: .75rem;
 }
 .qr-raw code {
   display: block;
   word-break: break-all;
   margin-top: .5rem;
   color: #64748b;
+  font-size: .6875rem;
+}
+.btn-copy-inline {
+  width: auto;
+  margin-top: .5rem;
+  padding: .4rem .75rem;
+  font-size: .8125rem;
+}
+
+/* QRIS panel — embedded checkout (Payments API v3 PRESENT_TO_CUSTOMER) */
+.qris-panel {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 16px;
+  overflow: hidden;
+  text-align: center;
+}
+.qris-header {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+.qris-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .15rem;
+}
+.qris-badge {
+  display: inline-block;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: .6875rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  padding: .2rem .55rem;
+  border-radius: 4px;
+}
+.qris-sub {
+  font-size: .6875rem;
+  color: rgba(255,255,255,.75);
+}
+.qris-amount {
+  font-size: 1.5rem;
+  color: #fff;
+  letter-spacing: -.02em;
+}
+.qris-frame {
+  background: #fff;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 280px;
+}
+.qris-qr {
+  display: block;
+  width: 240px;
+  height: 240px;
+  image-rendering: pixelated;
+}
+.qris-steps {
+  text-align: left;
+  padding: 1rem 1.25rem 1rem 2rem;
+  margin: 0;
+  background: #0f172a;
+}
+.qris-hosted-link {
+  display: inline-block;
+  margin: 0 1rem 1rem;
+  padding: .625rem 1rem;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #38bdf8;
+  text-decoration: none;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.qris-hosted-link:hover {
+  background: #334155;
+  color: #7dd3fc;
 }
 .hint {
   font-size: .8125rem;

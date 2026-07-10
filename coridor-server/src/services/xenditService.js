@@ -51,6 +51,46 @@ function authHeader() {
   };
 }
 
+/** Normalize Xendit v3 actions for logging / widget */
+export function describePaymentActions(paymentRequest) {
+  const actions = paymentRequest?.actions || [];
+  const present = actions.find((a) => a.type === "PRESENT_TO_CUSTOMER") || null;
+  const redirect = actions.find((a) => a.type === "REDIRECT_CUSTOMER") || null;
+  return {
+    status: paymentRequest?.status,
+    channel_code: paymentRequest?.channel_code,
+    action_types: actions.map((a) => ({
+      type: a.type,
+      descriptor: a.descriptor,
+    })),
+    qr_string: present?.descriptor === "QR_STRING" ? present.value : null,
+    va_number:
+      present?.descriptor === "VIRTUAL_ACCOUNT_NUMBER" ? present.value : null,
+    redirect_url: redirect?.value || redirect?.url || null,
+  };
+}
+
+export function getRedirectUrl(paymentRequest) {
+  const actions = paymentRequest?.actions || [];
+  const redirect = actions.find((a) => a.type === "REDIRECT_CUSTOMER");
+  return redirect?.value || redirect?.url || null;
+}
+
+export function getPresentAction(paymentRequest) {
+  const actions = paymentRequest?.actions || [];
+  return (
+    actions.find((a) => a.type === "PRESENT_TO_CUSTOMER") || actions[0] || null
+  );
+}
+
+export function getQrString(paymentRequest) {
+  const present = getPresentAction(paymentRequest);
+  if (!present) return null;
+  if (present.descriptor === "QR_STRING") return present.value;
+  if (present.qr_string) return present.qr_string;
+  return null;
+}
+
 /**
  * Create Xendit Payment Request (v3 Payments API)
  * @see https://docs.xendit.co
@@ -71,8 +111,8 @@ export async function createPaymentRequest({
     channel_code: channelCode,
     channel_properties: {
       ...channelPropertiesFor(channelCode, customer),
-      success_return_url: `http://localhost:8091/sep24/interactive?paid=1&ref=${referenceId}`,
-      failure_return_url: `http://localhost:8091/sep24/interactive?paid=0&ref=${referenceId}`,
+      success_return_url: `${config.publicBaseUrl}/sep24/interactive?paid=1&ref=${referenceId}`,
+      failure_return_url: `${config.publicBaseUrl}/sep24/interactive?paid=0&ref=${referenceId}`,
     },
     metadata: { coridor_transaction_id: referenceId },
   };
@@ -87,6 +127,12 @@ export async function createPaymentRequest({
   if (!res.ok) {
     throw new Error(`Xendit payment error: ${JSON.stringify(data)}`);
   }
+  console.log(
+    "[xendit] payment_request",
+    data.payment_request_id,
+    channelCode,
+    JSON.stringify(describePaymentActions(data))
+  );
   return data;
 }
 

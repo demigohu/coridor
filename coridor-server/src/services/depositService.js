@@ -1,8 +1,14 @@
 import { config } from "../config.js";
 import { getRate } from "./rateService.js";
 import { platform } from "./platformClient.js";
-import { createPaymentRequest, CHANNEL_MAP } from "./xenditService.js";
+import {
+  createPaymentRequest,
+  CHANNEL_MAP,
+  describePaymentActions,
+  getQrString,
+} from "./xenditService.js";
 import { sendUsdc } from "./stellarService.js";
+import QRCode from "qrcode";
 
 /** @type {Map<string, object>} */
 export const pendingPayments = new Map();
@@ -34,6 +40,18 @@ export async function startDepositFlow({
     });
   }
 
+  let qrDataUrl = null;
+  const qrString = xenditPayment ? getQrString(xenditPayment) : null;
+  if (qrString) {
+    qrDataUrl = await QRCode.toDataURL(qrString, {
+      width: 280,
+      margin: 2,
+      errorCorrectionLevel: "M",
+    });
+  }
+
+  const paymentUi = xenditPayment ? describePaymentActions(xenditPayment) : null;
+
   pendingPayments.set(transactionId, {
     xenditId: xenditPayment?.payment_request_id,
     amountIn: q.sell_amount,
@@ -54,7 +72,7 @@ export async function startDepositFlow({
     instructions: buildInstructions(xenditPayment, paymentMethod),
   });
 
-  return { quote: q, xendit: xenditPayment };
+  return { quote: q, xendit: xenditPayment, qr_data_url: qrDataUrl, payment_ui: paymentUi };
 }
 
 function buildInstructions(xenditPayment, method) {
