@@ -7,25 +7,31 @@ Panduan deploy anchor **Coridor** (Anchor Platform + coridor-server) ke VPS prod
 ```
 Internet
    │
-   ├─ sep.YOURDOMAIN.com  ──► Nginx ──► platform:8080   (SEP-24, auth, stellar.toml)
+   ├─ sep.coridor.fun  ──► Nginx ──► platform:8080   (SEP-24, auth, stellar.toml)
    │
-   └─ api.YOURDOMAIN.com  ──► Nginx ──► coridor-server:8091 (widget, rate, webhook Xendit)
+   └─ api.coridor.fun  ──► Nginx ──► coridor-server:8091 (widget, rate, webhook Xendit)
 
 Internal (Docker network):
   platform ◄──► coridor-server ◄──► postgres + kafka
 ```
 
-| Service | Port internal | Publik (via Nginx) |
-|---------|---------------|---------------------|
-| Anchor Platform (SEP) | 8080 | `https://sep.YOURDOMAIN.com` |
-| Platform API | 8085 | Tidak perlu expose (internal) |
-| coridor-server | 8091 | `https://api.YOURDOMAIN.com` |
-| PostgreSQL | 5432 | **Jangan expose** ke internet |
-| Kafka | 29092 | **Jangan expose** ke internet |
+
+| Service               | Port internal | Publik (via Nginx)            |
+| --------------------- | ------------- | ----------------------------- |
+| Anchor Platform (SEP) | 8080          | `https://sep.coridor.fun`  |
+| Platform API          | 8085          | Tidak perlu expose (internal) |
+| coridor-server        | 8091          | `https://api.coridor.fun`  |
+| PostgreSQL            | 5432          | **Jangan expose** ke internet |
+| Kafka                 | 29092         | **Jangan expose** ke internet |
+
 
 ---
 
+
+
 ## 1. Persiapan VPS
+
+
 
 ### Spesifikasi minimum
 
@@ -33,6 +39,8 @@ Internal (Docker network):
 - 2 vCPU, 4 GB RAM (Kafka + Anchor Platform butuh memori)
 - 20 GB disk
 - Domain dengan akses DNS (A record)
+
+
 
 ### Install dependensi
 
@@ -56,6 +64,8 @@ sudo usermod -aG docker $USER
 # Logout & login ulang agar grup docker aktif
 ```
 
+
+
 ### Firewall
 
 ```bash
@@ -67,18 +77,24 @@ sudo ufw enable
 
 ---
 
+
+
 ## 2. DNS
 
 Buat **A record** ke IP VPS:
 
-| Host | Contoh |
-|------|--------|
-| `sep` | `sep.coridor.id` → `203.0.113.10` |
-| `api` | `api.coridor.id` → `203.0.113.10` |
 
-Ganti `coridor.id` dengan domain kamu. Tunggu propagasi DNS (5–30 menit).
+| Host  | Contoh                            |
+| ----- | --------------------------------- |
+| `sep` | `sep.coridor.fun` → `203.0.113.10` |
+| `api` | `api.coridor.fun` → `203.0.113.10` |
+
+
+Ganti `coridor.fun` dengan domain kamu. Tunggu propagasi DNS (5–30 menit).
 
 ---
+
+
 
 ## 3. Clone & setup project
 
@@ -91,6 +107,8 @@ cd /opt/coridor
 git clone https://github.com/YOUR_ORG/anchor-platform.git .
 cd coridor
 ```
+
+
 
 ### Secrets
 
@@ -125,6 +143,8 @@ Salin ke `dev.env` untuk semua `SECRET_*_JWT_SECRET`.
 
 ---
 
+
+
 ## 4. Konfigurasi production (`dev.env`)
 
 Edit `dev.env` — ganti semua `localhost` dengan domain production.
@@ -137,12 +157,12 @@ nano dev.env
 
 ```bash
 # Domain SEP (tanpa https://, tanpa port — wallet pakai ini sebagai home domain)
-SEP10_WEB_AUTH_DOMAIN=sep.coridor.id
-SEP10_HOME_DOMAINS=sep.coridor.id
+SEP10_WEB_AUTH_DOMAIN=sep.coridor.fun
+SEP10_HOME_DOMAINS=sep.coridor.fun
 
 # URL publik coridor-server
-SEP24_INTERACTIVE_URL_BASE_URL=https://api.coridor.id/sep24/interactive
-SEP24_MORE_INFO_URL_BASE_URL=https://api.coridor.id/sep24/transaction/more_info
+SEP24_INTERACTIVE_URL_BASE_URL=https://api.coridor.fun/sep24/interactive
+SEP24_MORE_INFO_URL_BASE_URL=https://api.coridor.fun/sep24/transaction/more_info
 
 # DB password — harus sama dengan .env.secrets
 SECRET_DATA_PASSWORD=GantiDenganPasswordKuat123!
@@ -156,13 +176,15 @@ STELLAR_NETWORK_HORIZON_URL=https://horizon-testnet.stellar.org
 
 ---
 
+
+
 ## 5. Generate `stellar.toml` production
 
 Edit template atau generate dengan domain production:
 
 ```bash
-export SEP_DOMAIN=sep.coridor.id
-export API_DOMAIN=api.coridor.id
+export SEP_DOMAIN=sep.coridor.fun
+export API_DOMAIN=api.coridor.fun
 export HOST_SEP10_ACCOUNT=G...   # dari .env.secrets
 
 cat > config/stellar.localhost.toml << EOF
@@ -188,7 +210,7 @@ display_decimals = 2
 
 [DOCUMENTATION]
 ORG_NAME = "Coridor"
-ORG_URL = "https://coridor.id"
+ORG_URL = "https://coridor.fun"
 ORG_DESCRIPTION = "IDR anchor Indonesia — cash in/out Rupiah ↔ Stellar via Xendit."
 EOF
 ```
@@ -196,40 +218,36 @@ EOF
 Verifikasi nanti:
 
 ```bash
-curl -s https://sep.coridor.id/.well-known/stellar.toml | head -20
+curl -s https://sep.coridor.fun/.well-known/stellar.toml | head -20
 ```
 
 ---
+
+
 
 ## 6. Docker Compose production
 
-Buat override agar DB/Kafka tidak expose ke internet:
+File `docker-compose.prod.yaml` sudah ada di repo. Isinya bind service ke `127.0.0.1` saja (Nginx yang publik) dan **tidak expose** DB/Kafka.
+
+**Penting:** harus pakai `ports: !override` — Docker Compose **merge/append** daftar `ports` dari dua file. Tanpa `!override`, hasilnya port dobel:
+
+```
+8091:8091              ← dari docker-compose.yaml (0.0.0.0)
+127.0.0.1:8091:8091    ← dari prod override
+→ error: address already in use (padahal ss/lsof kosong)
+```
+
+Verifikasi sebelum `up`:
 
 ```bash
-cat > docker-compose.prod.yaml << 'EOF'
-services:
-  platform:
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8082:8080"
-      - "127.0.0.1:8086:8085"
-
-  coridor-server:
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8091:8091"
-
-  db:
-    restart: unless-stopped
-    ports: []   # hapus expose 5432
-
-  kafka:
-    restart: unless-stopped
-    ports: []   # hapus expose 29092
-EOF
+docker compose -f docker-compose.yaml -f docker-compose.prod.yaml config \
+  | grep -A3 'coridor-server:' | grep published
+# Harus cuma satu baris published: '8091' dengan host_ip 127.0.0.1
 ```
 
 ---
+
+
 
 ## 7. Nginx + SSL (Let's Encrypt)
 
@@ -237,12 +255,14 @@ EOF
 sudo apt install -y nginx certbot python3-certbot-nginx
 ```
 
+
+
 ### `/etc/nginx/sites-available/coridor-sep`
 
 ```nginx
 server {
     listen 80;
-    server_name sep.coridor.id;
+    server_name sep.coridor.fun;
 
     location / {
         proxy_pass http://127.0.0.1:8082;
@@ -256,12 +276,14 @@ server {
 }
 ```
 
+
+
 ### `/etc/nginx/sites-available/coridor-api`
 
 ```nginx
 server {
     listen 80;
-    server_name api.coridor.id;
+    server_name api.coridor.fun;
 
     location / {
         proxy_pass http://127.0.0.1:8091;
@@ -282,12 +304,14 @@ sudo ln -sf /etc/nginx/sites-available/coridor-sep /etc/nginx/sites-enabled/
 sudo ln -sf /etc/nginx/sites-available/coridor-api /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 
-sudo certbot --nginx -d sep.coridor.id -d api.coridor.id
+sudo certbot --nginx -d sep.coridor.fun -d api.coridor.fun
 ```
 
 Certbot otomatis redirect HTTP → HTTPS.
 
 ---
+
+
 
 ## 8. Jalankan stack
 
@@ -309,29 +333,36 @@ Tunggu ~30–60 detik sampai platform healthy.
 ### Health check
 
 ```bash
-curl -s https://sep.coridor.id/.well-known/stellar.toml | head -5
-curl -s https://api.coridor.id/health | jq .
-curl -s "https://api.coridor.id/rate?type=indicative&sell_asset=iso4217:IDR&buy_asset=stellar:USDC:GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56&sell_amount=100000" | jq .
+curl -s https://sep.coridor.fun/.well-known/stellar.toml | head -5
+curl -s https://api.coridor.fun/health | jq .
+curl -s "https://api.coridor.fun/rate?type=indicative&sell_asset=iso4217:IDR&buy_asset=stellar:USDC:GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56&sell_amount=100000" | jq .
 ```
 
 ---
+
+
 
 ## 9. Xendit webhook
 
 Di [Xendit Dashboard](https://dashboard.xendit.co) → **Settings → Webhooks**:
 
-| Setting | Value |
-|---------|-------|
-| URL | `https://api.coridor.id/xendit/webhook` |
+
+| Setting            | Value                                                |
+| ------------------ | ---------------------------------------------------- |
+| URL                | `https://api.coridor.fun/xendit/webhook`              |
 | Verification token | sama dengan `XENDIT_WEBHOOK_TOKEN` di `.env.secrets` |
+
 
 Events yang perlu: payment request succeeded / payment capture.
 
 **Sandbox vs Live:**
+
 - Test: `xnd_development_...` — deposit VA/QR perlu tombol simulate di widget
 - Production: `xnd_production_...` — pembayaran real
 
 ---
+
+
 
 ## 10. Akun Stellar distribution
 
@@ -345,20 +376,26 @@ Cek di [Stellar Expert testnet](https://stellar.expert/explorer/testnet).
 
 ---
 
+
+
 ## 11. Test end-to-end
+
+
 
 ### Demo Wallet
 
-1. Buka https://demo-wallet.stellar.org
-2. Add asset: **USDC** / home domain **`sep.coridor.id`** (HTTPS wajib)
+1. Buka [https://demo-wallet.stellar.org](https://demo-wallet.stellar.org)
+2. Add asset: **USDC** / home domain `sep.coridor.fun` (HTTPS wajib)
 3. Deposit IDR → simulate (sandbox) → terima USDC
 4. Withdraw USDC → Approve & Send → cek payout di Xendit
+
+
 
 ### Wallet / project lain
 
 Project lain integrate via standar SEP — tidak perlu fork code Coridor:
 
-1. Baca `https://sep.YOURDOMAIN.com/.well-known/stellar.toml`
+1. Baca `https://sep.coridor.fun/.well-known/stellar.toml`
 2. SEP-10 auth ke `WEB_AUTH_ENDPOINT`
 3. SEP-24 deposit/withdraw ke `TRANSFER_SERVER_SEP0024`
 
@@ -375,6 +412,8 @@ POST /sep24/transactions/withdraw/interactive
 Lihat [SEP-24 docs](https://developers.stellar.org/docs/data/anchor/sep-guide/sep-24).
 
 ---
+
+
 
 ## 12. Auto-start saat reboot (opsional)
 
@@ -403,6 +442,8 @@ sudo systemctl enable coridor
 
 ---
 
+
+
 ## 13. Update / redeploy
 
 ```bash
@@ -415,16 +456,21 @@ docker compose logs -f --tail=50 platform coridor-server
 
 ---
 
+
+
 ## 14. Troubleshooting
 
-| Gejala | Penyebab | Solusi |
-|--------|----------|--------|
-| Demo Wallet tidak connect | HTTP / domain salah | Pastikan HTTPS + `SEP10_HOME_DOMAINS` match domain TOML |
-| Deposit stuck setelah bayar | Webhook tidak sampai | Cek URL webhook Xendit + log `docker compose logs coridor-server` |
-| Withdraw USDC terkirim, IDR tidak | Observer tidak deteksi | Pastikan `STELLAR_NETWORK_TYPE=horizon`, bukan `rpc` |
-| `fetch failed` ke Xendit | DNS Docker | Sudah ada DNS `8.8.8.8` di docker-compose coridor-server |
-| Widget redirect "coming soon" | Cache lama | Hard refresh; pastikan coridor-server versi terbaru |
-| SEP-10 error | JWT secret beda | Pastikan `SECRET_SEP10_JWT_SECRET` sama di platform & server |
+
+| Gejala                            | Penyebab               | Solusi                                                            |
+| --------------------------------- | ---------------------- | ----------------------------------------------------------------- |
+| `8091 address already in use`, `ss`/`lsof` kosong | Port dobel dari merge compose | Pakai `ports: !override` di `docker-compose.prod.yaml` (lihat §6) |
+| Demo Wallet tidak connect         | HTTP / domain salah    | Pastikan HTTPS + `SEP10_HOME_DOMAINS` match domain TOML           |
+| Deposit stuck setelah bayar       | Webhook tidak sampai   | Cek URL webhook Xendit + log `docker compose logs coridor-server` |
+| Withdraw USDC terkirim, IDR tidak | Observer tidak deteksi | Pastikan `STELLAR_NETWORK_TYPE=horizon`, bukan `rpc`              |
+| `fetch failed` ke Xendit          | DNS Docker             | Sudah ada DNS `8.8.8.8` di docker-compose coridor-server          |
+| Widget redirect "coming soon"     | Cache lama             | Hard refresh; pastikan coridor-server versi terbaru               |
+| SEP-10 error                      | JWT secret beda        | Pastikan `SECRET_SEP10_JWT_SECRET` sama di platform & server      |
+
 
 Log penting:
 
@@ -435,6 +481,8 @@ sudo tail -f /var/log/nginx/error.log
 ```
 
 ---
+
+
 
 ## 15. Checklist go-live
 
@@ -450,9 +498,12 @@ sudo tail -f /var/log/nginx/error.log
 
 ---
 
+
+
 ## Referensi
 
 - [Anchor Platform docs](https://developers.stellar.org/docs/platforms/anchor-platform)
 - [SEP-24](https://developers.stellar.org/docs/data/anchor/sep-guide/sep-24)
 - [Xendit Payments API v3](https://docs.xendit.co)
 - Local dev: lihat [README.md](./README.md)
+
