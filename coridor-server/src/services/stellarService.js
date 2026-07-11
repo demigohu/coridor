@@ -99,3 +99,16 @@ export async function getUsdcBalance() {
   );
   return line?.balance ?? "0";
 }
+
+export async function getAccountUsdcBalance(publicKey) {
+  if (!publicKey) return null;
+  try {
+    const acct = await server.loadAccount(publicKey);
+    const line = acct.balances.find(
+      (b) => b.asset_code === "USDC" && b.asset_issuer === USDC_ISSUER
+    );
+    return line?.balance ?? "0";
+  } catch {
+    return null;
+  }
+}

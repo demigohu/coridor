@@ -1,6 +1,27 @@
 const paymentMethod = document.getElementById("paymentMethod");
 const mobileField = document.getElementById("mobileField");
 
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const isIconBtn = btn.classList.contains("btn-icon-copy");
+    if (isIconBtn) {
+      const prevLabel = btn.getAttribute("aria-label");
+      btn.setAttribute("aria-label", "Tersalin!");
+      setTimeout(() => btn.setAttribute("aria-label", prevLabel || "Salin"), 1500);
+      return;
+    }
+    const prev = btn.textContent;
+    btn.textContent = "Tersalin!";
+    setTimeout(() => {
+      btn.textContent = prev;
+    }, 1500);
+  });
+}
+
+document.querySelectorAll(".btn-copy-account").forEach((btn) => {
+  btn.addEventListener("click", () => copyText(btn.dataset.copy, btn));
+});
+
 if (paymentMethod && mobileField) {
   const paymentMethodHint = document.getElementById("paymentMethodHint");
   const updatePaymentMethodUi = () => {
@@ -11,13 +32,13 @@ if (paymentMethod && mobileField) {
     if (paymentMethodHint) {
       if (method === "e_wallet") {
         paymentMethodHint.textContent =
-          "OVO: setelah Lanjutkan, notifikasi push dikirim ke nomor HP di bawah.";
+          "Notifikasi push OVO dikirim setelah Anda klik Lanjutkan.";
       } else if (method === "qris") {
         paymentMethodHint.textContent =
-          "QRIS: setelah Lanjutkan, scan QR dengan e-wallet / m-banking.";
+          "QR code akan muncul setelah Anda klik tombol di bawah.";
       } else {
         paymentMethodHint.textContent =
-          "VA: setelah klik Lanjutkan, muncul nomor rekening virtual untuk ditransfer.";
+          "VA akan muncul setelah Anda klik tombol di bawah.";
       }
     }
   };
@@ -27,16 +48,6 @@ if (paymentMethod && mobileField) {
 
 function formatIdr(n) {
   return `Rp ${Number(n).toLocaleString("id-ID")}`;
-}
-
-function copyText(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    const prev = btn.textContent;
-    btn.textContent = "Tersalin!";
-    setTimeout(() => {
-      btn.textContent = prev;
-    }, 1500);
-  });
 }
 
 function escapeHtml(value) {
