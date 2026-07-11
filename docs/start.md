@@ -1,12 +1,12 @@
 # Getting Started
 
-Use Coridor to move value between **IDR** (Indonesian Rupiah) and **USDC Blend** on Stellar through any **SEP-24** compatible wallet.
+Use Coridor to move value between **IDR** (Indonesian Rupiah) and **USDC** on Stellar through any **SEP-24** compatible wallet.
 
 ---
 
 ## Prerequisites
 
-- A Stellar **testnet** wallet with a trustline to **USDC Blend**
+- A Stellar **testnet** wallet with a trustline to **USDC**
 - USDC issuer: `GATALTGTWIOT6BUDBCZM3Q4OQ4BO2COLOAZ7IYSKPLC2PMSOPPGF5V56`
 - Anchor home domain: **`sep.coridor.fun`** (production) or `localhost:8082` (local dev)
 

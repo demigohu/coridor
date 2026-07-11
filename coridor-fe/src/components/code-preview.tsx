@@ -57,21 +57,31 @@ export default function CodePreview() {
               <span className="size-2.5 rounded-full bg-[#28C840]" />
             </div>
             <span className="truncate font-mono text-[10px] text-slate-400 sm:text-xs">
-              POST /v1/charges/qris
+              SEP-24 · deposit
             </span>
           </div>
           <pre className="max-w-full overflow-x-auto p-3 font-mono text-[10px] leading-relaxed text-slate-300 sm:p-5 sm:text-[13px]">
             <code className="block min-w-max sm:min-w-0">
-              <span className="text-violet-400">curl</span> -X POST https://api.corridor.fi/v1/charges \
-              {"\n"}  -H <span className="text-emerald-400">&quot;Authorization: Bearer sk_test_123&quot;</span> \
-              {"\n"}  -H <span className="text-emerald-400">&quot;Content-Type: application/json&quot;</span> \
-              {"\n"}  -d <span className="text-emerald-400">&apos;{"{"}</span>
-              {"\n"}    <span className="text-sky-300">&quot;amount&quot;</span>: <span className="text-amber-300">1500000</span>,
-              {"\n"}    <span className="text-sky-300">&quot;currency&quot;</span>: <span className="text-emerald-400">&quot;IDR&quot;</span>,
-              {"\n"}    <span className="text-sky-300">&quot;destination_currency&quot;</span>: <span className="text-emerald-400">&quot;USDC&quot;</span>,
-              {"\n"}    <span className="text-sky-300">&quot;payment_method&quot;</span>: <span className="text-emerald-400">&quot;qris&quot;</span>,
-              {"\n"}    <span className="text-sky-300">&quot;wallet_address&quot;</span>: <span className="text-emerald-400">&quot;0x742d35Cc6634C0532925a3b844Bc454e4438f44d&quot;</span>
-              {"\n"}  <span className="text-emerald-400">{"}"}&apos;</span>
+              <span className="text-violet-400">const</span>{" "}
+              <span className="text-sky-300">{"{ url, id }"}</span>{" "}
+              <span className="text-violet-400">=</span>{" "}
+              <span className="text-violet-400">await</span> anchor
+              .sep24().deposit({"{"}
+              {"\n"}  authToken,{" "}
+              <span className="text-sky-300">assetCode</span>:{" "}
+              <span className="text-emerald-400">&quot;USDC&quot;</span>,
+              {"\n"}  lang:{" "}
+              <span className="text-emerald-400">&quot;en&quot;</span>,
+              {"\n"}
+              {"}"});
+              {"\n"}
+              <span className="text-slate-500">
+                {"// Open url → user pays IDR (VA / QRIS / OVO)"}
+              </span>
+              {"\n"}
+              <span className="text-slate-500">
+                {"// Anchor sends USDC to G... wallet on completion"}
+              </span>
             </code>
           </pre>
         </div>

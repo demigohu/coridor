@@ -1,6 +1,6 @@
 # Acquire USDC & XLM (testnet)
 
-Before integrating, the wallet (or test account) needs **XLM for fees** and a **USDC Blend trustline** on Stellar testnet.
+Before integrating, the wallet (or test account) needs **XLM for fees** and a **USDC trustline** on Stellar testnet.
 
 ---
 

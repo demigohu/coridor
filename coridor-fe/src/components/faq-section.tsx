@@ -7,34 +7,34 @@ import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const FAQ_ITEMS = [
   {
-    question: "What is Corridor?",
+    question: "What is Coridor?",
     answer:
-      "Corridor is a developer-first fiat-to-crypto bridge for Indonesia. It lets your app accept IDR payments via QRIS and automatically settle USDC to a user's on-chain wallet through a single API integration.",
+      "Coridor is a Stellar anchor for Indonesia. Wallets connect via SEP-10 and SEP-24 to move value between IDR (Rupiah) and USDC on Stellar, using local payments through Xendit.",
   },
   {
-    question: "How fast are settlements?",
+    question: "How do I integrate as a developer?",
     answer:
-      "Once a QRIS payment is confirmed, stablecoins are dispatched to the destination wallet in real-time. Most settlements complete within seconds, depending on network conditions.",
+      "Use standard Stellar wallet flows: SEP-10 auth against sep.coridor.fun, then SEP-24 deposit or withdraw. Open the interactive URL from the SEP-24 response — users complete payment in the Coridor widget. See our documentation for step-by-step guides.",
   },
   {
     question: "Which payment methods are supported?",
     answer:
-      "Corridor supports QRIS, which means users can pay with major Indonesian e-wallets and banking apps that display a QRIS code at checkout.",
+      "Deposits: virtual account (BCA, BNI, Mandiri, BRI), QRIS, and OVO e-wallet. Withdrawals: IDR bank transfer to the account the user enters in the widget.",
   },
   {
-    question: "Do I need a crypto license to integrate?",
+    question: "Which wallets and network?",
     answer:
-      "Corridor is built with compliance in mind and handles the regulated fiat on-ramp flow. Your integration requirements may vary based on your product and jurisdiction — contact us for guidance specific to your use case.",
+      "Any SEP-24 compatible Stellar wallet with home domain sep.coridor.fun. Staging runs on Stellar testnet. The fastest way to try it is the Stellar Demo Wallet.",
   },
   {
-    question: "Which stablecoins and chains are supported?",
+    question: "What are the fees?",
     answer:
-      "USDC settlement is supported out of the box, with wallet delivery to EVM-compatible addresses. Additional assets and networks can be discussed based on your integration needs.",
+      "Default staging rates: Rp 5,000 flat fee plus approximately 0.5% spread over the market USDC/IDR rate. Use Rp 50,000 or more for deposits to avoid the flat fee dominating small amounts.",
   },
   {
-    question: "How do I get started?",
+    question: "Is this production / real money?",
     answer:
-      "Sign up for API access, grab your test keys from the dashboard, and follow our documentation to create your first QRIS charge. You can go from signup to a test payment in under an hour.",
+      "Current public staging uses Stellar testnet and Xendit sandbox. VA and QRIS in sandbox are completed with the Simulate button in the widget — not real bank transfers until go-live.",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function FaqSection() {
             Frequently Asked Questions
           </h2>
           <p className="mt-3 text-base text-muted-foreground md:text-lg">
-            Everything you need to know about integrating Corridor.
+            Everything you need to know about Coridor.
           </p>
         </div>
 

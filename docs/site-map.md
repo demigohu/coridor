@@ -24,23 +24,17 @@ GET https://api.coridor.fun/rate?type=indicative&sell_asset=iso4217:IDR&buy_asse
 ## Routes
 
 ```
-/docs                              → redirect to /docs/start
+/docs                              → redirect to /docs/what-is-coridor
+/docs/what-is-coridor
+/docs/how-coridor-works
+/docs/main-use-cases
+/docs/architecture
 /docs/start
 /docs/deposit
 /docs/withdraw
 /docs/faq
 /docs/developers
-/docs/developers/integrate
-/docs/developers/acquire-usdc
-/docs/developers/authenticate
-/docs/developers/initiate-transaction
-/docs/developers/customer-info
-/docs/developers/close-interactive
-/docs/developers/send-receive-funds
-/docs/developers/poll-status
-/docs/developers/payout-status
-/docs/developers/api
-/docs/developers/stellar
+...
 ```
 
 ---
@@ -49,6 +43,10 @@ GET https://api.coridor.fun/rate?type=indicative&sell_asset=iso4217:IDR&buy_asse
 
 | Route | Markdown file |
 |-------|----------------|
+| `/docs/what-is-coridor` | [what-is-coridor.md](./what-is-coridor.md) |
+| `/docs/how-coridor-works` | [how-coridor-works.md](./how-coridor-works.md) |
+| `/docs/main-use-cases` | [main-use-cases.md](./main-use-cases.md) |
+| `/docs/architecture` | [architecture.md](./architecture.md) |
 | `/docs/start` | [start.md](./start.md) |
 | `/docs/deposit` | [deposit.md](./deposit.md) |
 | `/docs/withdraw` | [withdraw.md](./withdraw.md) |
@@ -73,6 +71,12 @@ Import as MDX at build time or copy into the frontend repo.
 ## Sidebar (suggested)
 
 ```
+Overview
+  └─ What is Coridor
+  └─ How Coridor works
+  └─ Main use cases
+  └─ Architecture
+
 Getting started
   └─ Prerequisites & Demo Wallet
   └─ Fees & limits

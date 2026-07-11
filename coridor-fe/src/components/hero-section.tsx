@@ -1,10 +1,13 @@
 "use client";
 
 import CodePreview from "@/components/code-preview";
-import { Braces } from "lucide-react";
+import { Braces, Wallet } from "lucide-react";
 import gsap from "gsap";
 import Link from "next/link";
 import { useLayoutEffect, useRef } from "react";
+
+const GITBOOK_URL = "https://coridor.gitbook.io/";
+const DEMO_WALLET_URL = "https://demo-wallet.stellar.org";
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,22 +46,36 @@ export default function HeroSection() {
         </h1>
 
         <p className="hero-description mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400 sm:mt-6 sm:text-base md:text-lg">
-          Developer-first infrastructure for IDR to USDC on-ramps via QRIS.
-          Seamlessly integrate compliant fiat rails into your Web3 application
-          with a single API call.
+          Stellar anchor for IDR ↔ USDC on-ramp and off-ramp. Integrate via
+          standard SEP-10 and SEP-24 — virtual account, QRIS, and e-wallet
+          checkout powered by Xendit.
         </p>
 
         <div className="hero-cta mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-8">
           <Link
-            href="https://coridor.gitbook.io/"
+            href={GITBOOK_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-black shadow-sm transition hover:bg-slate-200"
           >
             <Braces className="size-4" aria-hidden />
-            Read API Docs
+            Read the docs
+          </Link>
+          <Link
+            href={DEMO_WALLET_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-white/20 bg-white/5 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            <Wallet className="size-4" aria-hidden />
+            Try Demo Wallet
           </Link>
         </div>
+
+        <p className="hero-description mx-auto mt-4 max-w-lg text-xs text-zinc-500">
+          Testnet staging · home domain{" "}
+          <span className="font-mono text-zinc-400">sep.coridor.fun</span>
+        </p>
 
         <div className="hero-code mx-auto mt-6 w-full min-w-0 max-w-full sm:mt-8 sm:max-w-xl">
           <CodePreview />
