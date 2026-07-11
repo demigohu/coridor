@@ -1,13 +1,15 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Bell,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  BookOpen,
+  Braces,
   Coins,
-  FileText,
-  MapPin,
+  HelpCircle,
+  KeyRound,
   PlayCircle,
   Send,
   ShieldCheck,
-  UserCheck,
 } from "lucide-react";
 
 export type DocNavItem = {
@@ -17,65 +19,68 @@ export type DocNavItem = {
   children?: { title: string; href: string }[];
 };
 
+/** Matches coridor/docs/site-map.md — wire to GitBook or in-app /docs routes. */
 export const DOC_NAV: DocNavItem[] = [
   {
-    title: "Acquire XLM & USDC",
-    href: "/documentation/acquire-xlm-usdc",
-    icon: Coins,
+    title: "Getting started",
+    href: "/docs/start",
+    icon: BookOpen,
   },
   {
-    title: "Authenticate with MoneyGram",
-    href: "/documentation/authenticate-moneygram",
-    icon: ShieldCheck,
+    title: "Deposit IDR → USDC",
+    href: "/docs/deposit",
+    icon: ArrowDownToLine,
   },
   {
-    title: "Initiate Transaction",
-    href: "/documentation/initiate-transaction",
-    icon: PlayCircle,
+    title: "Withdraw USDC → IDR",
+    href: "/docs/withdraw",
+    icon: ArrowUpFromLine,
+  },
+  {
+    title: "FAQ",
+    href: "/docs/faq",
+    icon: HelpCircle,
+  },
+  {
+    title: "Integrate Coridor",
+    href: "/docs/developers/integrate",
+    icon: Braces,
     children: [
-      {
-        title: "Overview",
-        href: "/documentation/initiate-transaction",
-      },
-      {
-        title: "QRIS Deposit",
-        href: "/documentation/deposit-qris",
-      },
-      {
-        title: "Poll Transaction Status",
-        href: "/documentation/poll-transaction-status",
-      },
+      { title: "Overview", href: "/docs/developers/integrate" },
+      { title: "Acquire USDC", href: "/docs/developers/acquire-usdc" },
+      { title: "Authenticate (SEP-10)", href: "/docs/developers/authenticate" },
+      { title: "Initiate transaction", href: "/docs/developers/initiate-transaction" },
     ],
   },
   {
-    title: "Passing Customer Info (SEP-9)",
-    href: "/documentation/passing-customer-info",
-    icon: UserCheck,
+    title: "Authenticate (SEP-10)",
+    href: "/docs/developers/authenticate",
+    icon: ShieldCheck,
   },
   {
-    title: "Listen for Close Notification",
-    href: "/documentation/listen-close-notification",
-    icon: Bell,
+    title: "Initiate transaction (SEP-24)",
+    href: "/docs/developers/initiate-transaction",
+    icon: PlayCircle,
   },
   {
-    title: "Send or Receive Funds",
-    href: "/documentation/send-receive-funds",
+    title: "Send or receive USDC",
+    href: "/docs/developers/send-receive-funds",
     icon: Send,
   },
   {
-    title: "Fetch Reference Number",
-    href: "/documentation/fetch-reference-number",
-    icon: FileText,
+    title: "Poll transaction status",
+    href: "/docs/developers/poll-status",
+    icon: Coins,
   },
   {
-    title: "On Ramp Location Test Data",
-    href: "/documentation/on-ramp-test-data",
-    icon: MapPin,
+    title: "stellar.toml & SEP",
+    href: "/docs/developers/stellar",
+    icon: KeyRound,
   },
 ];
 
 export function isDocNavActive(pathname: string, href: string) {
-  if (href === "/documentation") {
+  if (href === "/docs") {
     return pathname === href;
   }
   return pathname === href || pathname.startsWith(`${href}/`);

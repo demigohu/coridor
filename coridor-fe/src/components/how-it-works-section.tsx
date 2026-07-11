@@ -1,6 +1,6 @@
 "use client";
 
-import { Blocks, QrCode, Wallet } from "lucide-react";
+import { KeyRound, QrCode, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useRef } from "react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -13,23 +13,23 @@ const STEPS: {
 }[] = [
   {
     step: "01",
-    title: "Connect API",
+    title: "Authenticate (SEP-10)",
     description:
-      "Integrate our SDK. Users generate a unique QRIS code directly within your platform interface.",
-    icon: Blocks,
+      "Your wallet signs a challenge against sep.coridor.fun and receives a session token for SEP-24.",
+    icon: KeyRound,
   },
   {
     step: "02",
-    title: "Local Payment",
+    title: "Pay or withdraw in IDR",
     description:
-      "Users pay via any Indonesian e-wallet or banking app by scanning the instant QRIS code.",
+      "Open the Coridor interactive widget — virtual account, QRIS, or OVO for deposits; bank details for cash out.",
     icon: QrCode,
   },
   {
     step: "03",
-    title: "Auto Settle",
+    title: "Settle on Stellar",
     description:
-      "Stablecoins are automatically dispatched to the user's on-chain wallet address in real-time.",
+      "Deposits: anchor sends USDC to the user wallet. Withdrawals: user sends USDC with memo, then IDR hits their bank.",
     icon: Wallet,
   },
 ];
@@ -52,10 +52,10 @@ export default function HowItWorksSection() {
       <div className="mx-auto max-w-7xl">
         <div className="hiw-header mb-14 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white md:text-4xl">
-            How Corridor Works
+            How Coridor Works
           </h2>
           <p className="mt-3 text-base text-muted-foreground md:text-lg">
-            Simple, secure, and compliant. Move funds in seconds.
+            Standard Stellar anchor flows — no proprietary SDK required.
           </p>
         </div>
 

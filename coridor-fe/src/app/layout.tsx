@@ -23,8 +23,9 @@ const wallpoet = Wallpoet({
 });
 
 export const metadata: Metadata = {
-  title: "Coridor",
-  description: "The Instant Fiat-to-Crypto Bridge for Indonesia",
+  title: "Coridor — IDR ↔ USDC on Stellar",
+  description:
+    "Stellar anchor for Indonesia. IDR on-ramp and off-ramp via SEP-24 — virtual account, QRIS, and e-wallet. Settle USDC on Stellar.",
 };
 
 export default function RootLayout({

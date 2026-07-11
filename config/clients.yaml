@@ -1,6 +1,13 @@
 items:
-  - name: demoWallet
-    type: noncustodial
-    domains:
-      - demo-wallet.stellar.org
-      - localhost
+    - name: demoWallet
+      type: noncustodial
+      domains:
+        - demo-wallet.stellar.org
+        - localhost
+    - name: sanca
+      type: noncustodial
+      domains:
+        - www.sanca.space
+        - sanca.space
+        - localhost:3000
+  
