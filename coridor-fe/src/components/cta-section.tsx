@@ -7,8 +7,6 @@ import { useRef } from "react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
 const GITBOOK_URL = "https://coridor.gitbook.io/";
-const DEMO_WALLET_URL = "https://demo-wallet.stellar.org";
-const TOML_URL = "https://sep.coridor.fun/.well-known/stellar.toml";
 
 const SCROLL_TARGETS = [
   { selector: ".cta-text > *", stagger: 0.12 },
@@ -37,30 +35,26 @@ export default function CtaSection() {
 
             <div className="cta-button flex flex-wrap items-center gap-3">
               <Link
-                href={GITBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/buy"
                 className="inline-flex items-center justify-center gap-2 rounded-md bg-white px-5 py-3.5 text-sm font-semibold text-black shadow-sm transition hover:bg-slate-200"
               >
-                Developer docs
+                Try Buy demo
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
               <Link
-                href={DEMO_WALLET_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/sell"
                 className="inline-flex items-center justify-center gap-2 rounded-md border border-white/30 bg-transparent px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
               >
                 <Wallet className="size-4" aria-hidden />
-                Demo Wallet
+                Try Sell demo
               </Link>
               <Link
-                href={TOML_URL}
+                href={GITBOOK_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-md px-3 py-3.5 text-sm font-medium text-white/80 underline-offset-4 hover:text-white hover:underline"
               >
-                stellar.toml
+                Developer docs
               </Link>
             </div>
           </div>

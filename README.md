@@ -284,7 +284,7 @@ coridor/
 ### Quick start
 
 ```bash
-git clone https://github.com/demigohu/coridor.git
+git clone https://github.com/garrybad/coridor.git
 cd coridor
 cp .env.secrets.example .env.secrets
 # Edit .env.secrets — SECRET_DISTRIBUTION_SEED, SECRET_SEP10_SIGNING_SEED, XENDIT_SECRET_KEY
@@ -347,8 +347,7 @@ Production deploy: see [DEPLOY.md](./DEPLOY.md)
 
 | Name | Role | Location | Focus | LinkedIn |
 |------|------|----------|-------|----------|
-| Tegar Aji Kurniawan | Builder | 🇮🇩 Indonesia | Backend | [linkedin.com/in/tegaraji](https://www.linkedin.com/in/tegaraji/) |
-| Muhammad Garry Badruzzaman | Builder | 🇮🇩 Indonesia | Frontend | [linkedin.com/in/muhammad-garry](https://www.linkedin.com/in/muhammad-garry/) |
+| Muhammad Garry Badruzzaman | Builder | 🇮🇩 Indonesia | FullStack | [linkedin.com/in/muhammad-garry](https://www.linkedin.com/in/muhammad-garry/) |
 
 ---
 
@@ -359,7 +358,7 @@ Production deploy: see [DEPLOY.md](./DEPLOY.md)
 
 | Deliverable                 | Status                                                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Public open-source repo     | [https://github.com/demigohu/coridor](https://github.com/demigohu/coridor)                              |
+| Public open-source repo     | [https://github.com/garrybad/coridor](https://github.com/garrybad/coridor)                              |
 | Detailed README             | This file                                                                                               |
 | Live app (public link)      | [https://sep.coridor.fun](https://sep.coridor.fun) · [https://api.coridor.fun](https://api.coridor.fun) |
 | Landing Page     | [https://coridor.fun](https://coridor.fun)  |
@@ -387,7 +386,7 @@ Full user and developer guides live in `[docs/](./docs/README.md)` and on GitBoo
 
 ## Links
 
-- **Repository:** [https://github.com/demigohu/coridor](https://github.com/demigohu/coridor)
+- **Repository:** [https://github.com/garrybad/coridor](https://github.com/garrybad/coridor)
 - **Anchor:** [https://sep.coridor.fun](https://sep.coridor.fun)
 - **API:** [https://api.coridor.fun](https://api.coridor.fun)
 - **Docs:** [https://coridor.gitbook.io](https://coridor.gitbook.io)

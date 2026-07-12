@@ -6,6 +6,7 @@ import HeroSection from "@/components/hero-section";
 import HowItWorksSection from "@/components/how-it-works-section";
 import FaqSection from "@/components/faq-section";
 import CtaSection from "@/components/cta-section";
+import Footer from "@/components/footer";
 import Image from "next/image";
 
 export default function Home() {
@@ -82,6 +83,7 @@ export default function Home() {
       <HowItWorksSection />
       <FaqSection />
       <CtaSection />
+      <Footer />
     </main>
   );
 }

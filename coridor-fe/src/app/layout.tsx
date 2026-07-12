@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Wallpoet, Inter, Michroma } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,10 +37,9 @@ export default function RootLayout({
       lang="en"
       className={`${wallpoet.variable} ${michroma.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <Navbar />
         {children}
-        <Footer />
       </body>
     </html>
   );

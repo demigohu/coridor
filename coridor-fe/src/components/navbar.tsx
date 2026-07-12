@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { usePathname } from "next/navigation";
 
-type CenterItemKey = "home" | "documentation" | "github";
+type CenterItemKey = "home" | "buy" | "sell" | "documentation" | "github";
 
 const GITBOOK_URL = "https://coridor.gitbook.io/";
 const GITHUB_URL = "https://github.com/garrybad/coridor";
@@ -26,7 +26,21 @@ const CENTER_ITEMS: {
             href: "/",
             label: "Home",
             title: "Home",
-            description: "Welcome to the Coridor documentation. Here you will find all the information you need to get started with Coridor.",
+            description: "Coridor — on/off-ramp infrastructure for Stellar wallets in APAC.",
+        },
+        {
+            key: "buy",
+            href: "/buy",
+            label: "Buy",
+            title: "Buy (demo)",
+            description: "Try on-ramp: local fiat to USDC on Stellar testnet via Coridor SEP-24.",
+        },
+        {
+            key: "sell",
+            href: "/sell",
+            label: "Sell",
+            title: "Sell (demo)",
+            description: "Try off-ramp: USDC to local bank via Coridor SEP-24.",
         },
         {
             key: "documentation",
