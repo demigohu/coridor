@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
 type CenterItemKey = "home" | "documentation" | "github";
 
 const GITBOOK_URL = "https://coridor.gitbook.io/";
-const GITHUB_URL = "https://github.com/demigohu/coridor";
+const GITHUB_URL = "https://github.com/garrybad/coridor";
 
 const CENTER_ITEMS: {
     key: CenterItemKey;
