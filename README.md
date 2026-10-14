@@ -284,7 +284,7 @@ coridor/
 ### Quick start
 
 ```bash
-git clone https://github.com/garrybad/coridor.git
+git clone https://github.com/demigohu/coridor.git
 cd coridor
 cp .env.secrets.example .env.secrets
 # Edit .env.secrets — SECRET_DISTRIBUTION_SEED, SECRET_SEP10_SIGNING_SEED, XENDIT_SECRET_KEY
@@ -358,7 +358,7 @@ Production deploy: see [DEPLOY.md](./DEPLOY.md)
 
 | Deliverable                 | Status                                                                                                  |
 | --------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Public open-source repo     | [https://github.com/garrybad/coridor](https://github.com/garrybad/coridor)                              |
+| Public open-source repo     | [https://github.com/demigohu/coridor](https://github.com/demigohu/coridor)                              |
 | Detailed README             | This file                                                                                               |
 | Live app (public link)      | [https://sep.coridor.fun](https://sep.coridor.fun) · [https://api.coridor.fun](https://api.coridor.fun) |
 | Landing Page     | [https://coridor.fun](https://coridor.fun)  |
