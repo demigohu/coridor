@@ -347,7 +347,7 @@ Production deploy: see [DEPLOY.md](./DEPLOY.md)
 
 | Name | Role | Location | Focus | LinkedIn |
 |------|------|----------|-------|----------|
-| Muhammad Garry Badruzzaman | Builder | 🇮🇩 Indonesia | FullStack | [linkedin.com/in/muhammad-garry](https://www.linkedin.com/in/muhammad-garry/) |
+| Tegar Aji Kurniawan | Builder | 🇮🇩 Indonesia | FullStack | [linkedin.com/in/tegaraji/](https://www.linkedin.com/in/tegaraji/) |
 
 ---
 
